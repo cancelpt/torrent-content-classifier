@@ -1,0 +1,380 @@
+- id: archive.subtitle_pack.tgz
+  priority: 1000
+  enabled: true
+  when:
+    all:
+      - ext_all: [".tgz"]
+      - total_files_lte: 1
+      - name_regex: "ass|pgs|subtitle|sub"
+  then:
+    kind: archive
+    subtype: archive_subtitle_pack
+    confidence: 0.88
+    reason: single tgz subtitle pack
+
+- id: image.collection.bpg
+  priority: 950
+  enabled: true
+  when:
+    all:
+      - ext_all: [".bpg"]
+      - total_files_gte: 2
+  then:
+    kind: image
+    subtype: image_collection
+    confidence: 0.90
+    reason: all files are bpg images
+
+- id: music.single_track.flac
+  priority: 930
+  enabled: true
+  when:
+    all:
+      - ext_count_gte: {".flac": 1}
+      - not:
+          - ext_count_gte: {".flac": 2}
+          - ext_any: [".mp3", ".m4a", ".wav", ".ape", ".ogg", ".wma", ".aac", ".tak", ".tta", ".wv", ".aiff", ".aif", ".dsf", ".dff", ".iso", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup"]
+  then:
+    kind: music
+    subtype: music_single_track_flac
+    confidence: 0.95
+    reason: single flac track package
+
+- id: music.uncommon_codec
+  priority: 900
+  enabled: true
+  when:
+    any:
+      - ext_any: [".tak", ".tta", ".wv", ".aiff", ".aif"]
+  then:
+    kind: music
+    subtype: music_uncommon_format
+    confidence: 0.90
+    reason: uncommon lossless audio codec
+
+- id: music.bad_format
+  priority: 890
+  enabled: true
+  when:
+    all:
+      - ext_any: [".ogg", ".wma", ".ape"]
+      - dominant_extension_in: [".ogg", ".wma", ".ape"]
+      - not:
+          - ext_any: [".flac", ".mp3", ".m4a", ".wav", ".aac", ".tak", ".tta", ".wv", ".aiff", ".aif", ".dsf", ".dff", ".iso", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup"]
+  then:
+    kind: music
+    subtype: music_bad_format
+    confidence: 0.88
+    reason: lower-priority or incompatible music format
+
+- id: music.full_album.wav_cue
+  priority: 885
+  enabled: true
+  when:
+    all:
+      - ext_any: [".wav"]
+      - ext_any: [".cue"]
+      - not:
+          - ext_any: [".tak", ".tta", ".wv", ".aiff", ".aif", ".dsf", ".dff", ".iso", ".ogg", ".wma", ".ape", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup"]
+  then:
+    kind: music
+    subtype: music_full_album
+    confidence: 0.92
+    reason: wav cue full-disc pattern
+
+- id: music.flac.with_log
+  priority: 880
+  enabled: true
+  when:
+    all:
+      - ext_count_gte: {".flac": 2}
+      - any:
+          - ext_any: [".log"]
+          - ext_any: [".accurip"]
+      - not:
+          - ext_any: [".mp3", ".m4a", ".wav", ".ape", ".ogg", ".wma", ".aac", ".tak", ".tta", ".wv", ".aiff", ".aif", ".dsf", ".dff", ".iso", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup"]
+          - name_regex: "vinyl|lineage"
+  then:
+    kind: music
+    subtype: music_flac_with_log
+    confidence: 0.97
+    reason: flac set with log or accurip proof
+
+- id: music.flac.no_log
+  priority: 870
+  enabled: true
+  when:
+    all:
+      - ext_count_gte: {".flac": 2}
+      - not:
+          - ext_any: [".log", ".accurip", ".txt", ".mp3", ".m4a", ".wav", ".ape", ".ogg", ".wma", ".aac", ".tak", ".tta", ".wv", ".aiff", ".aif", ".dsf", ".dff", ".iso", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup"]
+          - name_regex: "vinyl|lineage"
+  then:
+    kind: music
+    subtype: music_flac_no_log
+    confidence: 0.81
+    reason: flac set without log signal
+
+- id: music.mp3.lossy
+  priority: 865
+  enabled: true
+  when:
+    all:
+      - ext_count_gte: {".mp3": 2}
+      - not:
+          - ext_any: [".flac", ".m4a", ".wav", ".ape", ".ogg", ".wma", ".aac", ".tak", ".tta", ".wv", ".aiff", ".aif", ".dsf", ".dff", ".iso", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup"]
+  then:
+    kind: music
+    subtype: music_mp3_lossy
+    confidence: 0.85
+    reason: pure mp3 package
+
+- id: music.m4a.lossy
+  priority: 864
+  enabled: true
+  when:
+    all:
+      - ext_count_gte: {".m4a": 2}
+      - not:
+          - ext_any: [".flac", ".mp3", ".wav", ".ape", ".ogg", ".wma", ".aac", ".tak", ".tta", ".wv", ".aiff", ".aif", ".dsf", ".dff", ".iso", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup"]
+  then:
+    kind: music
+    subtype: music_m4a_lossy
+    confidence: 0.85
+    reason: pure m4a package
+
+- id: video.bluray.structure
+  priority: 925
+  enabled: true
+  when:
+    ext_any: [".m2ts", ".bdmv", ".clpi", ".mpls"]
+  then:
+    kind: video
+    subtype: video_bluray_structure
+    confidence: 0.98
+    reason: bluray structure files present
+
+- id: video.bluray.iso
+  priority: 920
+  enabled: true
+  when:
+    all:
+      - ext_any: [".iso"]
+      - feature_gte: {bluray_hits: 1, largest_file_size: 10737418240}
+  then:
+    kind: video
+    subtype: video_bluray_iso
+    confidence: 0.98
+    reason: bluray markers with 10GB+ iso payload
+
+- id: video.tv.season
+  priority: 910
+  enabled: true
+  when:
+    any:
+      - feature_gte: {season_episode_hits: 2}
+      - all:
+          - feature_gte: {season_hits: 1}
+          - any:
+              - ext_count_gte: {".mkv": 2}
+              - ext_count_gte: {".mp4": 2}
+              - ext_count_gte: {".avi": 2}
+              - ext_count_gte: {".mov": 2}
+              - ext_count_gte: {".wmv": 2}
+              - ext_count_gte: {".flv": 2}
+              - ext_count_gte: {".webm": 2}
+              - ext_count_gte: {".ts": 2}
+              - ext_count_gte: {".m2ts": 2}
+              - ext_count_gte: {".vob": 2}
+  then:
+    kind: video
+    subtype: video_tv_season
+    confidence: 0.95
+    reason: multiple episode markers in a season pack
+
+- id: video.adult.movie
+  priority: 912
+  enabled: true
+  when:
+    all:
+      - ext_any: [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob"]
+      - feature_eq: {video_file_count: 1}
+      - feature_gte: {adult_hits: 1}
+      - not:
+          - feature_gte: {season_episode_hits: 1}
+  then:
+    kind: video
+    subtype: video_adult_movie
+    confidence: 0.90
+    reason: single video with adult naming marker
+
+- id: video.tv.episode
+  priority: 908
+  enabled: true
+  when:
+    all:
+      - ext_any: [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob"]
+      - feature_eq: {video_file_count: 1}
+      - any:
+          - feature_gte: {season_episode_hits: 1}
+          - feature_gte: {season_hits: 1}
+  then:
+    kind: video
+    subtype: video_tv_episode
+    confidence: 0.84
+    reason: single video with season episode markers
+
+- id: video.dvd.structure
+  priority: 906
+  enabled: true
+  when:
+    ext_any: [".vob", ".ifo", ".bup"]
+  then:
+    kind: video
+    subtype: video_dvd_structure
+    confidence: 0.97
+    reason: dvd structure files detected
+
+- id: video.movie
+  priority: 904
+  enabled: true
+  when:
+    ext_any: [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob"]
+  then:
+    kind: video
+    subtype: video_movie
+    confidence: 0.78
+    reason: generic video package
+
+- id: video.dvd_iso
+  priority: 850
+  enabled: true
+  when:
+    all:
+      - ext_any: [".iso"]
+      - any:
+          - ext_any: [".mds", ".mdf"]
+          - name_regex: "dvdiso|dvd|480i|480p|720x480|r2j"
+  then:
+    kind: video
+    subtype: video_dvd_iso
+    confidence: 0.90
+    reason: dvd iso pattern
+
+- id: comic.archive_volume
+  priority: 840
+  enabled: true
+  when:
+    all:
+      - ext_any: [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz", ".tgz"]
+      - feature_gte: {volume_hits: 1}
+      - dominant_extension_in: [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz", ".tgz"]
+      - not:
+          - ext_any: [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup", ".pdf", ".epub", ".mobi", ".azw3", ".djvu", ".chm", ".fb2", ".lit", ".rtf"]
+  then:
+    kind: comic
+    subtype: comic_archive
+    confidence: 0.86
+    reason: multi-volume archive pattern
+
+- id: comic.digital_archive
+  priority: 835
+  enabled: true
+  when:
+    all:
+      - ext_any: [".cbz", ".cbr"]
+      - dominant_extension_in: [".cbz", ".cbr"]
+      - not:
+          - ext_any: [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup", ".flac", ".wav", ".ape", ".mp3", ".aac", ".m4a", ".ogg", ".wma", ".dsf", ".dff", ".tak", ".tta", ".wv", ".aiff", ".aif", ".m4b", ".aax", ".abs"]
+  then:
+    kind: comic
+    subtype: comic_digital
+    confidence: 0.95
+    reason: comic archive extension detected
+
+- id: music.disc_image
+  priority: 820
+  enabled: true
+  when:
+    all:
+      - ext_any: [".iso"]
+      - any:
+          - name_regex: "ost|soundtrack|drama[ ._-]?cd|album|single|disc\\d*|cd"
+          - ext_any: [".cue", ".log", ".png", ".jpg", ".jpeg", ".bmp"]
+  then:
+    kind: music
+    subtype: music_disc_image
+    confidence: 0.82
+    reason: music disc image pattern
+
+- id: ebook.pdf_collection
+  priority: 815
+  enabled: true
+  when:
+    all:
+      - ext_any: [".pdf"]
+      - dominant_extension_in: [".pdf"]
+      - not:
+          - ext_any: [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup", ".flac", ".wav", ".ape", ".mp3", ".aac", ".m4a", ".ogg", ".wma", ".dsf", ".dff", ".tak", ".tta", ".wv", ".aiff", ".aif", ".m4b", ".aax", ".abs", ".cbz", ".cbr", ".exe", ".msi", ".apk", ".dmg", ".pkg", ".deb", ".rpm", ".appimage"]
+  then:
+    kind: ebook
+    subtype: ebook_pdf_collection
+    confidence: 0.92
+    reason: pdf ebook collection
+
+- id: ebook.collection
+  priority: 810
+  enabled: true
+  when:
+    all:
+      - ext_any: [".epub", ".mobi", ".azw3", ".djvu", ".chm", ".fb2", ".lit", ".rtf"]
+      - dominant_extension_in: [".epub", ".mobi", ".azw3", ".djvu", ".chm", ".fb2", ".lit", ".rtf"]
+      - not:
+          - ext_any: [".pdf", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup", ".flac", ".wav", ".ape", ".mp3", ".aac", ".m4a", ".ogg", ".wma", ".dsf", ".dff", ".tak", ".tta", ".wv", ".aiff", ".aif", ".m4b", ".aax", ".abs", ".cbz", ".cbr", ".exe", ".msi", ".apk", ".dmg", ".pkg", ".deb", ".rpm", ".appimage"]
+  then:
+    kind: ebook
+    subtype: ebook_collection
+    confidence: 0.92
+    reason: ebook document formats detected
+
+- id: archive.generic
+  priority: 805
+  enabled: true
+  when:
+    all:
+      - ext_any: [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz", ".tgz"]
+      - dominant_extension_in: [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz", ".tgz"]
+      - not:
+          - feature_gte: {volume_hits: 1}
+          - ext_any: [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup", ".flac", ".wav", ".ape", ".mp3", ".aac", ".m4a", ".ogg", ".wma", ".dsf", ".dff", ".tak", ".tta", ".wv", ".aiff", ".aif", ".m4b", ".aax", ".abs", ".cbz", ".cbr", ".pdf", ".epub", ".mobi", ".azw3", ".djvu", ".chm", ".fb2", ".lit", ".rtf", ".exe", ".msi", ".apk", ".dmg", ".pkg", ".deb", ".rpm", ".appimage"]
+  then:
+    kind: archive
+    subtype: archive_generic
+    confidence: 0.75
+    reason: generic archive package
+
+- id: document.text_bundle
+  priority: 790
+  enabled: true
+  when:
+    all:
+      - ext_any: [".txt", ".md", ".nfo"]
+      - dominant_extension_in: [".txt", ".md", ".nfo"]
+      - not:
+          - ext_any: [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".ts", ".m2ts", ".vob", ".ifo", ".bup", ".flac", ".wav", ".ape", ".mp3", ".aac", ".m4a", ".ogg", ".wma", ".dsf", ".dff", ".tak", ".tta", ".wv", ".aiff", ".aif", ".m4b", ".aax", ".abs", ".cbz", ".cbr", ".pdf", ".epub", ".mobi", ".azw3", ".djvu", ".chm", ".fb2", ".lit", ".rtf", ".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz", ".tgz", ".exe", ".msi", ".apk", ".dmg", ".pkg", ".deb", ".rpm", ".appimage", ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff", ".webp", ".bpg"]
+  then:
+    kind: document
+    subtype: document_text
+    confidence: 0.72
+    reason: text metadata/document package
+
+- id: software.disk_image
+  priority: 700
+  enabled: true
+  when:
+    ext_any: [".iso"]
+  then:
+    kind: software
+    subtype: software_disk_image
+    confidence: 0.62
+    reason: fallback iso software image

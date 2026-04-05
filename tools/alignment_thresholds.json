@@ -1,0 +1,6 @@
+{
+  "files_list": {
+    "min_exact_match_rate": 1.0,
+    "max_fallback_hit_rate": 0.1
+  }
+}
