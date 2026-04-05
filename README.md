@@ -1,5 +1,9 @@
 # torrent-content-classifier
 
+[![CI and Deploy Web App](https://github.com/cancelpt/torrent-content-classifier/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/cancelpt/torrent-content-classifier/actions/workflows/pages.yml)
+
+[Online Demo](https://cancelpt.github.io/torrent-content-classifier/)
+
 [简体中文文档](README.zh-CN.md)
 
 Rule-first torrent content classifier driven by YAML rules, with a minimal built-in fallback safety net.

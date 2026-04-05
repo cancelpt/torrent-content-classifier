@@ -54,6 +54,35 @@ body {
   font-size: 0.92rem;
 }
 
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  text-decoration: none;
+  background: #f8fbff;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.project-link:hover {
+  transform: translateY(-1px);
+  border-color: #99a9c9;
+  box-shadow: 0 6px 14px rgba(18, 30, 60, 0.12);
+}
+
+.project-link:active {
+  transform: translateY(0);
+}
+
+.project-link svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentcolor;
+}
+
 .controls {
   display: grid;
   gap: 0.6rem;
