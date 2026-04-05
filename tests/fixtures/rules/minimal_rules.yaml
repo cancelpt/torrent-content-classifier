@@ -1,0 +1,21 @@
+- id: music.uncommon.tak
+  priority: 900
+  enabled: true
+  when:
+    ext_any: [".tak"]
+  then:
+    kind: music
+    subtype: music_uncommon_format
+    confidence: 0.9
+    reason: detected TAK audio
+
+- id: archive.subtitle.tgz
+  priority: 800
+  enabled: true
+  when:
+    ext_any: [".tgz"]
+  then:
+    kind: archive
+    subtype: archive_subtitle_pack
+    confidence: 0.88
+    reason: subtitle tgz pack
