@@ -1,5 +1,9 @@
 # torrent-content-classifier
 
+[![GitHub Actions](https://github.com/cancelpt/torrent-content-classifier/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/cancelpt/torrent-content-classifier/actions/workflows/pages.yml)
+
+[在线体验](https://cancelpt.github.io/torrent-content-classifier/)
+
 基于 YAML 规则的种子内容分类器，采用“规则优先 + 最小内置回退”策略。
 
 ## 安装
