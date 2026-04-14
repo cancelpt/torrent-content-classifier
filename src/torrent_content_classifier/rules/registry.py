@@ -62,7 +62,10 @@ def _build_rule(payload: Mapping[str, Any]) -> Rule:
 
 def load_rule_set(path: Path) -> list[Rule]:
     """Load enabled rules from YAML sorted by priority descending."""
-    raw = path.read_text(encoding="utf-8")
+    if hasattr(path, "read_text"):
+        raw = path.read_text(encoding="utf-8")
+    else:
+        raw = Path(path).read_text(encoding="utf-8")
     payload = yaml.safe_load(raw)
     if not isinstance(payload, list):
         raise RuleRegistryError("rule file root must be a list")
