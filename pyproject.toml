@@ -7,6 +7,7 @@ name = "torrent-content-classifier"
 version = "0.1.0"
 description = "Classify torrent metadata into content types from name and file list."
 readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.8"
 dependencies = [
     "PyYAML>=6.0",
@@ -29,4 +30,3 @@ target-version = "py38"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
-
