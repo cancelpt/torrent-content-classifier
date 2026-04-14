@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
+from importlib import resources
 from pathlib import Path
 from uuid import uuid4
 
@@ -58,6 +59,20 @@ SOFTWARE_ISO_HINT_RE = re.compile(
 )
 
 
+def _default_rules_resource():
+    """Return package default rules resource with Python 3.8-compatible fallback."""
+    if hasattr(resources, "files"):
+        return resources.files("torrent_content_classifier.rules").joinpath(
+            "default_rules.yaml"
+        )
+    return Path(__file__).resolve().parent / "rules" / "default_rules.yaml"
+
+
+def get_default_rules_path() -> str:
+    """Return default rule resource location for diagnostics/integration checks."""
+    return str(_default_rules_resource())
+
+
 class TorrentClassifier:  # pylint: disable=too-few-public-methods
     """Classify torrent records using rules first and fallback as a safety net."""
 
@@ -65,9 +80,45 @@ class TorrentClassifier:  # pylint: disable=too-few-public-methods
         self.rules_path = (
             Path(rules_path)
             if rules_path is not None
-            else Path("src/torrent_content_classifier/rules/default_rules.yaml")
+            else _default_rules_resource()
         )
         self._rules = load_rule_set(self.rules_path)
+
+    @staticmethod
+    def _normalize_kind(kind: str, subtype: str) -> str:
+        if kind == "video":
+            if subtype.startswith("video_bluray"):
+                return "bluray"
+            if subtype.startswith("video_dvd"):
+                return "dvd"
+            return "video"
+
+        return {
+            "audiobook": "audiobook",
+            "document": "document",
+            "ebook": "document",
+            "image": "photo",
+            "comic": "comics",
+            "software": "program",
+            "music": "music",
+        }.get(kind, kind)
+
+    @staticmethod
+    def _normalize_music_subtype(subtype: str) -> str:
+        if not subtype:
+            return "unknown"
+
+        legacy_subtype_map = {
+            "music_bad_format": "bad_music",
+            "music_mixed": "unknown",
+        }
+        if subtype in legacy_subtype_map:
+            return legacy_subtype_map[subtype]
+
+        if subtype.startswith("music_"):
+            return subtype[len("music_") :]
+
+        return subtype
 
     def classify(self, record: TorrentRecord) -> ClassificationResult:
         """Classify a single torrent record."""
@@ -268,11 +319,18 @@ class TorrentClassifier:  # pylint: disable=too-few-public-methods
             "video_file_count": features.video_file_count,
             "matched_rule_ids": matched_rule_ids,
         }
+        normalized_kind = self._normalize_kind(best.kind, best.subtype)
         return ClassificationResult(
             info_hash=record.info_hash,
             torrent_name=record.torrent_name,
             kind=best.kind,
             subtype=best.subtype,
+            normalized_kind=normalized_kind,
+            normalized_music_subtype=(
+                self._normalize_music_subtype(best.subtype)
+                if normalized_kind == "music"
+                else ""
+            ),
             confidence=max(0.0, min(1.0, best.confidence)),
             reasons=[best.reason],
             indicators=indicators,
@@ -382,11 +440,18 @@ class TorrentClassifier:  # pylint: disable=too-few-public-methods
             "video_file_count": features.video_file_count,
             "matched_rule_ids": [],
         }
+        normalized_kind = self._normalize_kind(kind, subtype)
         return ClassificationResult(
             info_hash=record.info_hash,
             torrent_name=record.torrent_name,
             kind=kind,
             subtype=subtype,
+            normalized_kind=normalized_kind,
+            normalized_music_subtype=(
+                self._normalize_music_subtype(subtype)
+                if normalized_kind == "music"
+                else ""
+            ),
             confidence=max(0.0, min(1.0, confidence)),
             reasons=reasons,
             indicators=indicators,

@@ -26,7 +26,11 @@ python -m torrent_content_classifier classify \
 ## Use as a Python Package
 
 ```python
-from torrent_content_classifier import TorrentClassifier, TorrentRecord
+from torrent_content_classifier import (
+    TorrentClassifier,
+    TorrentRecord,
+    get_default_rules_path,
+)
 
 classifier = TorrentClassifier()  # or TorrentClassifier(rules_path="my_rules.yaml")
 record = TorrentRecord.from_mapping(
@@ -41,6 +45,8 @@ record = TorrentRecord.from_mapping(
 
 result = classifier.classify(record)
 print(result.to_dict())
+print(result.normalized_kind, result.normalized_music_subtype)
+print(get_default_rules_path())
 ```
 
 ## Use Custom Rules
@@ -110,6 +116,8 @@ Each record includes:
 - `torrent_name`
 - `kind`
 - `subtype`
+- `normalized_kind`
+- `normalized_music_subtype`
 - `confidence`
 - `reasons`
 - `matched_rule_ids`
@@ -151,4 +159,3 @@ npm run dev
 Then open the local URL printed by Vite (usually `http://localhost:5173`) and drag a `.torrent` file.
 
 Production build + GitHub Pages deployment is handled by [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
-

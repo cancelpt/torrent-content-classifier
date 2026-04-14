@@ -74,3 +74,23 @@ def test_unknown_no_rule_match_when_no_yaml_hit() -> None:
     record = _record("NoSignal", [("readme.bin", 1)])
     result = TorrentClassifier().classify(record)
     assert result.subtype in {"unknown_no_rule_match", "unknown_misc"}
+
+
+def test_default_rules_can_load_outside_project_root(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    record = _record("Faye.Wong.To.Youth.Collection.2013.FLAC", [("track01.flac", 15_000_000)])
+    result = TorrentClassifier().classify(record)
+    assert result.kind == "music"
+    assert result.subtype == "music_single_track_flac"
+
+
+def test_classification_result_includes_normalized_fields() -> None:
+    record = _record("Faye.Wong.To.Youth.Collection.2013.FLAC", [("track01.flac", 15_000_000)])
+    result = TorrentClassifier().classify(record)
+
+    assert result.normalized_kind == "music"
+    assert result.normalized_music_subtype == "single_track_flac"
+
+    payload = result.to_dict()
+    assert payload["normalized_kind"] == "music"
+    assert payload["normalized_music_subtype"] == "single_track_flac"

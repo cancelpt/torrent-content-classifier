@@ -4,6 +4,8 @@
 
 [在线体验](https://cancelpt.github.io/torrent-content-classifier/)
 
+[English README](README.md)
+
 基于 YAML 规则的种子内容分类器，采用“规则优先 + 最小内置回退”策略。
 
 ## 安装
@@ -24,7 +26,11 @@ python -m torrent_content_classifier classify \
 ## 作为 Python 包导入使用
 
 ```python
-from torrent_content_classifier import TorrentClassifier, TorrentRecord
+from torrent_content_classifier import (
+    TorrentClassifier,
+    TorrentRecord,
+    get_default_rules_path,
+)
 
 classifier = TorrentClassifier()  # 也可以传入 TorrentClassifier(rules_path="my_rules.yaml")
 record = TorrentRecord.from_mapping(
@@ -39,6 +45,8 @@ record = TorrentRecord.from_mapping(
 
 result = classifier.classify(record)
 print(result.to_dict())
+print(result.normalized_kind, result.normalized_music_subtype)
+print(get_default_rules_path())
 ```
 
 ## 使用自定义规则 YAML
@@ -108,6 +116,8 @@ python -m torrent_content_classifier classify \
 - `torrent_name`
 - `kind`
 - `subtype`
+- `normalized_kind`
+- `normalized_music_subtype`
 - `confidence`
 - `reasons`
 - `matched_rule_ids`
@@ -147,4 +157,3 @@ npm run dev
 ```
 
 启动后打开终端打印的本地地址（通常 `http://localhost:5173`），拖入 `.torrent` 文件即可即时分类。
-

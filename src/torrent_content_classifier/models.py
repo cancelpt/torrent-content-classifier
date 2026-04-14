@@ -67,6 +67,8 @@ class ClassificationResult:  # pylint: disable=too-many-instance-attributes
     kind: str
     subtype: str
     confidence: float
+    normalized_kind: str = ""
+    normalized_music_subtype: str = ""
     reasons: list[str] = field(default_factory=list)
     indicators: dict[str, Any] = field(default_factory=dict)
     matched_rule_ids: list[str] = field(default_factory=list)
@@ -79,6 +81,8 @@ class ClassificationResult:  # pylint: disable=too-many-instance-attributes
             "torrent_name": self.torrent_name,
             "kind": self.kind,
             "subtype": self.subtype,
+            "normalized_kind": self.normalized_kind,
+            "normalized_music_subtype": self.normalized_music_subtype,
             "confidence": round(float(self.confidence), 3),
             "reasons": self.reasons,
             "matched_rule_ids": self.matched_rule_ids,
